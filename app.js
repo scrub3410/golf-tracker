@@ -374,6 +374,12 @@ function renderHome() {
       <button class="big-btn" id="new-round">+ New Round</button>
       <div class="section-label">Rounds</div>
       ${cards || `<div class="empty-note">No rounds yet.<br>Tap <b>New Round</b> to start your first scorecard.</div>`}
+      <div class="backup-row">
+        <button class="backup-btn" id="export-btn">⬇ Export backup</button>
+        <button class="backup-btn" id="import-btn">⬆ Import backup</button>
+        <input type="file" id="import-file" accept=".json,application/json" hidden />
+      </div>
+      <div class="backup-note">Rounds live on this device only — export now and then to keep a copy safe.</div>
     </div>`;
 
   document.getElementById("new-round").onclick = () => {
@@ -399,6 +405,45 @@ function renderHome() {
       render();
     };
   });
+
+  // Backup: download all rounds as a JSON file / restore from one
+  document.getElementById("export-btn").onclick = () => {
+    const stamp = new Date().toISOString().slice(0, 10);
+    const blob = new Blob([JSON.stringify(rounds, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `golf-journal-backup-${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  };
+
+  document.getElementById("import-btn").onclick = () => document.getElementById("import-file").click();
+  document.getElementById("import-file").onchange = (e) => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let imported;
+      try {
+        imported = JSON.parse(reader.result);
+        if (!Array.isArray(imported) || imported.some((r) => !r.id || !Array.isArray(r.holes))) throw new Error();
+      } catch {
+        alert("That file doesn't look like a Golf Journal backup.");
+        return;
+      }
+      const plural = imported.length === 1 ? "round" : "rounds";
+      if (!confirm(`Import ${imported.length} ${plural} from this backup? Existing rounds with the same ID will be replaced.`)) return;
+      const byId = new Map(rounds.map((r) => [r.id, r]));
+      imported.forEach((r) => byId.set(r.id, r));
+      rounds = [...byId.values()].sort((a, b) => (a.date < b.date ? 1 : -1));
+      saveRounds();
+      render();
+    };
+    reader.readAsText(file);
+  };
 }
 
 // -- Setup: start a new round --
