@@ -28,6 +28,7 @@ function newHole() {
     fir: false,      // fairway in regulation (hidden on par 3s)
     tee: null,       // where the tee shot finished: {x, y} on the fairway target
     approach: "",    // approach distance in yards
+    club: "",        // club used for the approach
     shot: null,      // where the approach finished: {x, y} on the shot-tracker target
     gir: false,      // green in regulation
     upDown: false,   // scrambling up & down
@@ -215,6 +216,9 @@ function scoreClass(score, par) {
   if (score > par) return "over";
   return "";
 }
+
+// Clubs offered in the approach-club dropdown
+const CLUBS = ["Driver", "3W", "5W", "7W", "Hybrid", "3i", "4i", "5i", "6i", "7i", "8i", "9i", "PW", "GW", "SW", "LW"];
 
 // ---- Shot tracker (approach bullseye) ----
 // SVG viewBox is 240x280 with the flag at (120, 140).
@@ -633,6 +637,10 @@ function renderHoleTab(round) {
         <input type="number" inputmode="numeric" id="approach" placeholder="—" value="${esc(hole.approach)}" />
         <span class="unit">yds</span>
       </div>
+      <select id="club" class="club-select">
+        <option value="">Club used — optional</option>
+        ${CLUBS.map((c) => `<option value="${c}" ${hole.club === c ? "selected" : ""}>${c}</option>`).join("")}
+      </select>
     </div>
 
     <div class="card-box">
@@ -767,6 +775,7 @@ function renderHoleTab(round) {
 
   // Text inputs save as you type without re-rendering (so you don't lose focus)
   document.getElementById("approach").oninput = (e) => { hole.approach = e.target.value; save(); };
+  document.getElementById("club").onchange = (e) => { hole.club = e.target.value; save(); };
   document.getElementById("notes").oninput = (e) => { hole.notes = e.target.value; save(); };
 }
 

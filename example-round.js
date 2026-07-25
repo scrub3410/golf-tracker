@@ -26,7 +26,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 2,
       "score": 4,
-      "notes": "Solid start — 8 iron to 17 ft."
+      "notes": "Solid start — 8 iron to 17 ft.",
+      "club": "8i"
     },
     {
       "par": 4,
@@ -45,7 +46,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 2,
       "score": 6,
-      "notes": "Plugged lie in the bunker, hacked out."
+      "notes": "Plugged lie in the bunker, hacked out.",
+      "club": "8i"
     },
     {
       "par": 3,
@@ -61,7 +63,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 3,
       "score": 4,
-      "notes": ""
+      "notes": "",
+      "club": "9i"
     },
     {
       "par": 4,
@@ -80,7 +83,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 2,
       "score": 5,
-      "notes": ""
+      "notes": "",
+      "club": "7i"
     },
     {
       "par": 4,
@@ -99,7 +103,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 2,
       "score": 5,
-      "notes": ""
+      "notes": "",
+      "club": "7i"
     },
     {
       "par": 4,
@@ -118,7 +123,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 2,
       "score": 5,
-      "notes": ""
+      "notes": "",
+      "club": "6i"
     },
     {
       "par": 3,
@@ -134,7 +140,8 @@ const EXAMPLE_ROUND = {
       "upDown": true,
       "putts": 1,
       "score": 3,
-      "notes": "Up & down from the back bunker. Sandy!"
+      "notes": "Up & down from the back bunker. Sandy!",
+      "club": "4i"
     },
     {
       "par": 5,
@@ -153,7 +160,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 2,
       "score": 6,
-      "notes": ""
+      "notes": "",
+      "club": "SW"
     },
     {
       "par": 5,
@@ -172,7 +180,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 1,
       "score": 4,
-      "notes": "Birdie — wedge to 6 ft."
+      "notes": "Birdie — wedge to 6 ft.",
+      "club": "GW"
     },
     {
       "par": 4,
@@ -191,7 +200,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 2,
       "score": 5,
-      "notes": ""
+      "notes": "",
+      "club": "SW"
     },
     {
       "par": 4,
@@ -210,7 +220,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 2,
       "score": 4,
-      "notes": ""
+      "notes": "",
+      "club": "GW"
     },
     {
       "par": 4,
@@ -229,7 +240,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 2,
       "score": 5,
-      "notes": "This hole is a par 5 for me."
+      "notes": "This hole is a par 5 for me.",
+      "club": "5i"
     },
     {
       "par": 3,
@@ -245,7 +257,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 2,
       "score": 4,
-      "notes": ""
+      "notes": "",
+      "club": "9i"
     },
     {
       "par": 5,
@@ -264,7 +277,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 3,
       "score": 6,
-      "notes": "Three-jacked from 27 ft. Ugh."
+      "notes": "Three-jacked from 27 ft. Ugh.",
+      "club": "PW"
     },
     {
       "par": 4,
@@ -283,7 +297,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 2,
       "score": 5,
-      "notes": ""
+      "notes": "",
+      "club": "6i"
     },
     {
       "par": 3,
@@ -299,7 +314,8 @@ const EXAMPLE_ROUND = {
       "upDown": false,
       "putts": 1,
       "score": 2,
-      "notes": "Stuffed it to 4 ft. Birdie!"
+      "notes": "Stuffed it to 4 ft. Birdie!",
+      "club": "8i"
     },
     {
       "par": 4,
@@ -318,7 +334,8 @@ const EXAMPLE_ROUND = {
       "upDown": true,
       "putts": 1,
       "score": 4,
-      "notes": "Best sand save of the year."
+      "notes": "Best sand save of the year.",
+      "club": "9i"
     },
     {
       "par": 5,
@@ -337,7 +354,8 @@ const EXAMPLE_ROUND = {
       "upDown": true,
       "putts": 1,
       "score": 5,
-      "notes": "Chip and a putt to finish."
+      "notes": "Chip and a putt to finish.",
+      "club": "PW"
     }
   ]
 };
