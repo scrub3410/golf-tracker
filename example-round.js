@@ -19,8 +19,8 @@ const EXAMPLE_ROUND = {
       },
       "approach": "145",
       "shot": {
-        "x": 170,
-        "y": 148
+        "x": 156,
+        "y": 156
       },
       "gir": true,
       "upDown": false,
@@ -39,8 +39,8 @@ const EXAMPLE_ROUND = {
       },
       "approach": "150",
       "shot": {
-        "x": 195,
-        "y": 215
+        "x": 184,
+        "y": 214
       },
       "gir": false,
       "upDown": false,
@@ -56,8 +56,8 @@ const EXAMPLE_ROUND = {
       "tee": null,
       "approach": "125",
       "shot": {
-        "x": 50,
-        "y": 150
+        "x": 70,
+        "y": 157
       },
       "gir": true,
       "upDown": false,
@@ -77,7 +77,7 @@ const EXAMPLE_ROUND = {
       "approach": "160",
       "shot": {
         "x": 120,
-        "y": 235
+        "y": 232
       },
       "gir": false,
       "upDown": false,
@@ -96,8 +96,8 @@ const EXAMPLE_ROUND = {
       },
       "approach": "155",
       "shot": {
-        "x": 50,
-        "y": 70
+        "x": 59,
+        "y": 89
       },
       "gir": false,
       "upDown": false,
@@ -117,7 +117,7 @@ const EXAMPLE_ROUND = {
       "approach": "170",
       "shot": {
         "x": 120,
-        "y": 42
+        "y": 65
       },
       "gir": false,
       "upDown": false,
@@ -134,7 +134,7 @@ const EXAMPLE_ROUND = {
       "approach": "189",
       "shot": {
         "x": 120,
-        "y": 30
+        "y": 57
       },
       "gir": false,
       "upDown": true,
@@ -153,8 +153,8 @@ const EXAMPLE_ROUND = {
       },
       "approach": "90",
       "shot": {
-        "x": 60,
-        "y": 210
+        "x": 68,
+        "y": 211
       },
       "gir": false,
       "upDown": false,
@@ -173,8 +173,8 @@ const EXAMPLE_ROUND = {
       },
       "approach": "95",
       "shot": {
-        "x": 135,
-        "y": 128
+        "x": 131,
+        "y": 141
       },
       "gir": true,
       "upDown": false,
@@ -193,8 +193,8 @@ const EXAMPLE_ROUND = {
       },
       "approach": "70",
       "shot": {
-        "x": 110,
-        "y": 235
+        "x": 111,
+        "y": 232
       },
       "gir": false,
       "upDown": false,
@@ -213,8 +213,8 @@ const EXAMPLE_ROUND = {
       },
       "approach": "95",
       "shot": {
-        "x": 95,
-        "y": 160
+        "x": 102,
+        "y": 164
       },
       "gir": true,
       "upDown": false,
@@ -234,7 +234,7 @@ const EXAMPLE_ROUND = {
       "approach": "190",
       "shot": {
         "x": 120,
-        "y": 236
+        "y": 233
       },
       "gir": false,
       "upDown": false,
@@ -250,8 +250,8 @@ const EXAMPLE_ROUND = {
       "tee": null,
       "approach": "125",
       "shot": {
-        "x": 190,
-        "y": 200
+        "x": 181,
+        "y": 202
       },
       "gir": false,
       "upDown": false,
@@ -271,7 +271,7 @@ const EXAMPLE_ROUND = {
       "approach": "100",
       "shot": {
         "x": 120,
-        "y": 60
+        "y": 93
       },
       "gir": true,
       "upDown": false,
@@ -290,8 +290,8 @@ const EXAMPLE_ROUND = {
       },
       "approach": "165",
       "shot": {
-        "x": 235,
-        "y": 150
+        "x": 216,
+        "y": 158
       },
       "gir": false,
       "upDown": false,
@@ -307,8 +307,8 @@ const EXAMPLE_ROUND = {
       "tee": null,
       "approach": "148",
       "shot": {
-        "x": 128,
-        "y": 150
+        "x": 126,
+        "y": 157
       },
       "gir": true,
       "upDown": false,
@@ -327,8 +327,8 @@ const EXAMPLE_ROUND = {
       },
       "approach": "140",
       "shot": {
-        "x": 230,
-        "y": 140
+        "x": 213,
+        "y": 150
       },
       "gir": false,
       "upDown": true,
@@ -348,7 +348,7 @@ const EXAMPLE_ROUND = {
       "approach": "110",
       "shot": {
         "x": 120,
-        "y": 232
+        "y": 230
       },
       "gir": false,
       "upDown": true,

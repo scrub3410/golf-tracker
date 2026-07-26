@@ -2,6 +2,28 @@
 // All data is saved in your browser's localStorage — no account needed.
 
 const STORAGE_KEY = "golf-journal-rounds";
+const SCHEMA_KEY = "golf-journal-schema";
+const SCHEMA_VERSION = "2"; // v2: approach tracker gained a 30ft+ green zone and off-green miss area
+
+// Approach-tracker geometry (SVG viewBox 240x300, flag at (120, 150)).
+// Declared up here because loadRounds() may migrate old shots at startup.
+// 30 ft ring at 72px, green out to 86 ("30 ft+"), rough to 98, bunker to 112,
+// beyond that = off-green miss (long/short/left/right).
+const SHOT = { cx: 120, cy: 150, ring30: 63, greenR: 76, roughR: 87, bunkerR: 98 };
+
+// One-time rescale of shots recorded on the v1 target (center (120,140),
+// green 0-88px = 0-30 ft, rough to 100, bunker to 118) onto the v2 geometry,
+// preserving each shot's meaning (same feet on the green, same band otherwise).
+function migrateShotV2(shot) {
+  const dx = shot.x - 120;
+  const dy = shot.y - 140;
+  const d = Math.hypot(dx, dy) || 1;
+  let nd;
+  if (d <= 88) nd = (d * SHOT.ring30) / 88;
+  else if (d <= 100) nd = SHOT.greenR + ((d - 88) * (SHOT.roughR - SHOT.greenR)) / 12;
+  else nd = SHOT.roughR + ((d - 100) * (SHOT.bunkerR - SHOT.roughR)) / 18;
+  return { x: Math.round(SHOT.cx + (dx / d) * nd), y: Math.round(SHOT.cy + (dy / d) * nd) };
+}
 
 // ---- Data ----
 
@@ -10,8 +32,19 @@ function loadRounds() {
     const stored = localStorage.getItem(STORAGE_KEY);
     // First visit on this device: seed the demo round so there's something to explore.
     // (Deleting it saves an empty list, so it won't come back.)
-    if (stored == null && typeof EXAMPLE_ROUND !== "undefined") return [EXAMPLE_ROUND];
-    return JSON.parse(stored) || [];
+    if (stored == null) {
+      localStorage.setItem(SCHEMA_KEY, SCHEMA_VERSION);
+      return typeof EXAMPLE_ROUND !== "undefined" ? [EXAMPLE_ROUND] : [];
+    }
+    const rounds = JSON.parse(stored) || [];
+    // Rounds saved before the tracker redesign use the old target geometry —
+    // rescale their shot markers once so distances still read the same.
+    if (localStorage.getItem(SCHEMA_KEY) !== SCHEMA_VERSION) {
+      rounds.forEach((r) => r.holes.forEach((h) => { if (h.shot) h.shot = migrateShotV2(h.shot); }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(rounds));
+      localStorage.setItem(SCHEMA_KEY, SCHEMA_VERSION);
+    }
+    return rounds;
   } catch {
     return [];
   }
@@ -221,25 +254,28 @@ function scoreClass(score, par) {
 const CLUBS = ["Driver", "3W", "5W", "7W", "Hybrid", "3i", "4i", "5i", "6i", "7i", "8i", "9i", "PW", "GW", "SW", "LW"];
 
 // ---- Shot tracker (approach bullseye) ----
-// SVG viewBox is 240x280 with the flag at (120, 140).
-// The green is an 88px-radius circle representing 30 ft, so 1 ft ≈ 2.93px.
-
-const SHOT = { cx: 120, cy: 140, greenR: 88, roughR: 100, bunkerR: 118 };
+// Geometry consts (SHOT) and migrateShotV2 are declared near the top of this
+// file because loadRounds() needs them at startup.
 
 function shotInfo(shot) {
   if (!shot) return null;
-  const d = Math.hypot(shot.x - SHOT.cx, shot.y - SHOT.cy);
-  if (d <= SHOT.greenR) {
-    const feet = Math.max(1, Math.round((d * 30) / SHOT.greenR));
-    return { zone: "green", label: `On the green · ${feet} ft from the pin` };
+  const dx = shot.x - SHOT.cx;
+  const dy = shot.y - SHOT.cy;
+  const d = Math.hypot(dx, dy);
+  if (d <= SHOT.ring30) {
+    const feet = Math.max(1, Math.round((d * 30) / SHOT.ring30));
+    return { zone: "green", onGreen: true, label: `On the green · ${feet} ft from the pin` };
   }
-  if (d <= SHOT.roughR) return { zone: "rough", label: "Missed — in the rough" };
-  return { zone: "bunker", label: "Missed — greenside bunker" };
+  if (d <= SHOT.greenR) return { zone: "green30", onGreen: true, label: "On the green · 30 ft+" };
+  if (d <= SHOT.roughR) return { zone: "rough", onGreen: false, label: "Missed — in the rough" };
+  if (d <= SHOT.bunkerR) return { zone: "bunker", onGreen: false, label: "Missed — greenside bunker" };
+  const dir = Math.abs(dy) >= Math.abs(dx) ? (dy < 0 ? "long" : "short") : (dx < 0 ? "left" : "right");
+  return { zone: "off", onGreen: false, label: `Missed — ${dir} of the green` };
 }
 
 function shotTrackerSVG(round, currentIdx) {
-  const r10 = SHOT.greenR / 3;
-  const r20 = (SHOT.greenR * 2) / 3;
+  const r10 = SHOT.ring30 / 3;
+  const r20 = (SHOT.ring30 * 2) / 3;
   // One ball per hole that has a shot, numbered by hole; current hole drawn last (on top) in red
   const marker = round.holes
     .map((h, idx) => ({ shot: h.shot, idx }))
@@ -253,23 +289,25 @@ function shotTrackerSVG(round, currentIdx) {
       </g>`)
     .join("");
   return `
-    <svg id="shot-svg" class="shot-svg" viewBox="0 0 240 280" xmlns="http://www.w3.org/2000/svg">
+    <svg id="shot-svg" class="shot-svg" viewBox="0 0 240 300" xmlns="http://www.w3.org/2000/svg">
       <text x="120" y="14" class="dir-label">LONG</text>
-      <text x="120" y="274" class="dir-label">SHORT</text>
-      <circle cx="120" cy="140" r="${SHOT.bunkerR}" fill="#e7d7ab" stroke="#d6c390" stroke-width="1.5"/>
-      <circle cx="120" cy="140" r="${SHOT.roughR}" fill="#41694a"/>
-      <circle cx="120" cy="140" r="${SHOT.greenR}" fill="#7fae7f"/>
-      <circle cx="120" cy="140" r="${SHOT.greenR}" class="ring"/>
-      <circle cx="120" cy="140" r="${r20}" class="ring"/>
-      <circle cx="120" cy="140" r="${r10}" class="ring"/>
-      <text x="120" y="${140 + r10 - 5}" class="ring-label">10 ft</text>
-      <text x="120" y="${140 + r20 - 5}" class="ring-label">20 ft</text>
-      <text x="120" y="${140 + SHOT.greenR - 5}" class="ring-label">30 ft</text>
-      <text x="120" y="49" class="band-label">ROUGH</text>
-      <text x="120" y="35" class="band-label bunker">BUNKER</text>
-      <line x1="120" y1="140" x2="120" y2="118" stroke="#5b4a3a" stroke-width="2"/>
-      <path d="M120 118 L134 123 L120 128 Z" fill="#d64541"/>
-      <circle cx="120" cy="140" r="3" fill="#2f3e33"/>
+      <text x="120" y="297" class="dir-label">SHORT</text>
+      <rect x="4" y="20" width="232" height="264" rx="14" fill="#dee5d8" stroke="#cdd6c8" stroke-width="1"/>
+      <circle cx="120" cy="150" r="${SHOT.bunkerR}" fill="#e7d7ab" stroke="#d6c390" stroke-width="1.5"/>
+      <circle cx="120" cy="150" r="${SHOT.roughR}" fill="#41694a"/>
+      <circle cx="120" cy="150" r="${SHOT.greenR}" fill="#7fae7f"/>
+      <circle cx="120" cy="150" r="${SHOT.ring30}" class="ring"/>
+      <circle cx="120" cy="150" r="${r20}" class="ring"/>
+      <circle cx="120" cy="150" r="${r10}" class="ring"/>
+      <text x="120" y="${150 + r10 - 5}" class="ring-label">10 ft</text>
+      <text x="120" y="${150 + r20 - 5}" class="ring-label">20 ft</text>
+      <text x="120" y="${150 + SHOT.ring30 - 5}" class="ring-label">30 ft</text>
+      <text x="120" y="${150 + (SHOT.ring30 + SHOT.greenR) / 2 + 3}" class="ring-label">30 ft+</text>
+      <text x="120" y="71" class="band-label">ROUGH</text>
+      <text x="120" y="60" class="band-label bunker">BUNKER</text>
+      <line x1="120" y1="150" x2="120" y2="128" stroke="#5b4a3a" stroke-width="2"/>
+      <path d="M120 128 L134 133 L120 138 Z" fill="#d64541"/>
+      <circle cx="120" cy="150" r="3" fill="#2f3e33"/>
       ${marker}
     </svg>`;
 }
@@ -383,7 +421,6 @@ function renderHome() {
         <button class="backup-btn" id="import-btn">⬆ Import backup</button>
         <input type="file" id="import-file" accept=".json,application/json" hidden />
       </div>
-      <div class="backup-note">Rounds live on this device only — export now and then to keep a copy safe.</div>
     </div>`;
 
   document.getElementById("new-round").onclick = () => {
@@ -682,7 +719,7 @@ function renderHoleTab(round) {
       <div class="row-label">Approach shot tracker</div>
       ${shotTrackerSVG(round, i)}
       <div class="shot-footer">
-        <div class="shot-result ${shotInfo(hole.shot)?.zone === "green" ? "on" : ""}">${shotInfo(hole.shot)?.label ?? `Tap where your approach on hole ${holeNo(round, i)} finished`}</div>
+        <div class="shot-result ${shotInfo(hole.shot)?.onGreen ? "on" : ""}">${shotInfo(hole.shot)?.label ?? `Tap where your approach on hole ${holeNo(round, i)} finished`}</div>
         ${hole.shot ? '<button class="clear-shot" id="clear-shot">Clear</button>' : ""}
       </div>
     </div>`;
@@ -750,20 +787,12 @@ function renderHoleTab(round) {
   shotSvg.onclick = (e) => {
     const rect = shotSvg.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 240;
-    const y = ((e.clientY - rect.top) / rect.height) * 280;
-    const dx = x - SHOT.cx;
-    const dy = y - SHOT.cy;
-    const d = Math.hypot(dx, dy) || 1;
-    if (d > SHOT.bunkerR + 12) return; // tapped outside the target
-    let fx = x, fy = y;
-    if (d > SHOT.bunkerR) {
-      // near-miss taps snap into the middle of the bunker band
-      const f = (SHOT.bunkerR - 9) / d;
-      fx = SHOT.cx + dx * f;
-      fy = SHOT.cy + dy * f;
-    }
-    hole.shot = { x: Math.round(fx), y: Math.round(fy) };
-    hole.gir = shotInfo(hole.shot).zone === "green";
+    const y = ((e.clientY - rect.top) / rect.height) * 300;
+    hole.shot = {
+      x: Math.round(Math.min(230, Math.max(10, x))),  // keep the ball inside the target area
+      y: Math.round(Math.min(278, Math.max(26, y))),
+    };
+    hole.gir = shotInfo(hole.shot).onGreen;
     save(); render();
   };
   if (hole.shot) {
